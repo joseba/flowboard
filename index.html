@@ -3,284 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FLOWBOARD v23</title>
+    <title>FLOWBOARD v26</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Colores Base */
             --bg-body: #09090b;
             --bg-sidebar: #000000;
             --bg-card: #111113;
             --bg-hover: #1f1f23;
             --bg-input: #18181b;
             --border: #27272a;
-            
             --text-main: #e4e4e7;
             --text-muted: #a1a1aa;
-            
             --radius: 4px;
             --font-ui: 'Inter', sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
-
-            /* Colores de Estado */
-            --col-0: #7f1d1d;   /* Rojo oscuro */
-            --col-50: #7c2d12;  /* Naranja oscuro */
-            --col-100: #064e3b; /* Verde oscuro */
-            
+            --col-0: #7f1d1d;
+            --col-50: #7c2d12;
+            --col-100: #064e3b;
             --toast-bg: #e4e4e7;
             --toast-text: #000;
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            font-family: var(--font-ui);
-            background: var(--bg-body);
-            color: var(--text-main);
-            font-size: 13px;
-            height: 100vh;
-            display: flex;
-            overflow: hidden;
-        }
-
-        /* --- SIDEBAR --- */
-        .sidebar {
-            width: 260px;
-            background: var(--bg-sidebar);
-            border-right: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            flex-shrink: 0;
-            z-index: 20;
-        }
-
-        .sidebar-header {
-            height: 50px;
-            display: flex;
-            align-items: center;
-            padding: 0 16px;
-            border-bottom: 1px solid var(--border);
-            font-size: 14px;
-            gap: 8px;
-        }
+        body { font-family: var(--font-ui); background: var(--bg-body); color: var(--text-main); font-size: 13px; height: 100vh; display: flex; overflow: hidden; }
         
+        /* SIDEBAR */
+        .sidebar { width: 260px; background: var(--bg-sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; z-index: 20; }
+        .sidebar-header { height: 50px; display: flex; align-items: center; padding: 0 16px; border-bottom: 1px solid var(--border); font-size: 14px; gap: 8px; }
         .app-brand { font-weight: 700; color: var(--text-main); letter-spacing: -0.5px; }
-        
-        .entity-name { 
-            font-weight: 400; color: var(--text-muted); cursor: pointer;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-            transition: color 0.2s;
-        }
+        .entity-name { font-weight: 400; color: var(--text-muted); cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color 0.2s; }
         .entity-name:hover { color: #fff; text-decoration: underline; }
-
         .search-create-box { padding: 12px; border-bottom: 1px solid var(--border); }
         .input-group { display: flex; gap: 6px; }
-
-        input, select {
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            color: var(--text-main);
-            border-radius: var(--radius);
-            padding: 6px 10px;
-            font-family: var(--font-ui);
-            font-size: 13px;
-            width: 100%;
-            transition: border-color 0.2s;
-        }
-        input:focus, textarea:focus { outline: none; border-color: #52525b; }
-        
-        .btn {
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            color: var(--text-main);
-            border-radius: var(--radius);
-            padding: 0 12px;
-            height: 30px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 500;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            transition: all 0.1s;
-        }
+        input, select { background: var(--bg-input); border: 1px solid var(--border); color: var(--text-main); border-radius: var(--radius); padding: 6px 10px; font-family: var(--font-ui); font-size: 13px; width: 100%; transition: border-color 0.2s; }
+        input:focus, textarea:focus, select:focus { outline: none; border-color: #52525b; }
+        .btn { background: var(--bg-input); border: 1px solid var(--border); color: var(--text-main); border-radius: var(--radius); padding: 0 12px; height: 30px; cursor: pointer; font-size: 12px; font-weight: 500; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.1s; }
         .btn:hover { background: var(--bg-hover); }
         .btn-primary { background: var(--text-main); color: #000; border: none; font-weight: 600; }
         .btn-primary:hover { opacity: 0.9; }
-        
         .projects-list { flex: 1; overflow-y: auto; padding: 8px; }
-        .project-item {
-            padding: 8px 10px;
-            border-radius: var(--radius);
-            cursor: pointer;
-            color: var(--text-muted);
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 2px; border: 1px solid transparent;
-        }
+        .project-item { padding: 8px 10px; border-radius: var(--radius); cursor: pointer; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; border: 1px solid transparent; }
         .project-item:hover { background: var(--bg-hover); color: var(--text-main); }
         .project-item.active { background: var(--bg-hover); color: var(--text-main); border-color: var(--border); }
         .template-badge { font-size: 10px; background: #27272a; color: #fbbf24; padding: 2px 6px; border-radius: 2px; font-weight: 700; text-transform: uppercase; }
-
         .config-footer { padding: 12px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; }
         .btn-block { width: 100%; justify-content: center; font-weight: 600; letter-spacing: 0.5px; }
         .data-actions { display: flex; gap: 8px; }
 
-        /* --- MAIN AREA --- */
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            background: var(--bg-body);
-            overflow: hidden;
-        }
-
-        .top-bar {
-            height: 50px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            padding: 0 20px;
-            justify-content: space-between;
-            background: var(--bg-body);
-        }
+        /* MAIN AREA */
+        .main-content { flex: 1; display: flex; flex-direction: column; background: var(--bg-body); overflow: hidden; }
+        .top-bar { height: 50px; border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 20px; justify-content: space-between; background: var(--bg-body); }
         .project-title { font-weight: 600; font-size: 14px; margin-right: 12px; cursor: pointer; transition: color 0.2s; }
         .project-title:hover { color: #fff; text-decoration: underline; text-decoration-style: dotted; }
-
-        /* HEADER ACTIONS */
         .header-actions { display: flex; gap: 8px; }
-        .btn-header {
-            height: 24px; padding: 0 10px; font-size: 10px; text-transform: uppercase; font-weight: 600;
-            background: transparent; border: 1px solid var(--border); color: var(--text-muted);
-            border-radius: var(--radius); cursor: pointer; transition: all 0.2s;
-        }
+        .btn-header { height: 24px; padding: 0 10px; font-size: 10px; text-transform: uppercase; font-weight: 600; background: transparent; border: 1px solid var(--border); color: var(--text-muted); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; }
         .btn-header.template:hover { border-color: #fbbf24; color: #fbbf24; }
         .btn-header.template.active { background: #fbbf24; color: #000; border-color: #fbbf24; }
         .btn-header.clone:hover { border-color: #3b82f6; color: #3b82f6; }
         .btn-header.delete { color: #ef4444; border-color: rgba(239,68,68,0.3); }
         .btn-header.delete:hover { background: #ef4444; color: #fff; border-color: #ef4444; }
 
-        /* --- PROCESOS (CHEVRONS) --- */
-        .process-bar {
-            display: flex; width: 100%; height: 56px; 
-            background: var(--bg-card); border-bottom: 1px solid var(--border);
-            padding: 0 10px; align-items: center; gap: 4px; 
-            overflow-x: auto; scrollbar-width: none;
-        }
-        
-        .phase-arrow {
-            flex: 1; min-width: 140px; height: 44px;
-            position: relative; background: var(--bg-input);
-            display: flex; align-items: center; justify-content: center;
-            padding: 0 10px 0 25px; cursor: pointer;
-            color: rgba(255,255,255,0.6); transition: filter 0.2s;
-            clip-path: polygon(0% 0%, calc(100% - 15px) 0%, 100% 50%, calc(100% - 15px) 100%, 0% 100%, 15px 50%);
-            margin-right: -10px;
-        }
+        /* PROCESS BAR */
+        .process-bar { display: flex; width: 100%; height: 56px; background: var(--bg-card); border-bottom: 1px solid var(--border); padding: 0 10px; align-items: center; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+        .phase-arrow { flex: 1; min-width: 140px; height: 44px; position: relative; background: var(--bg-input); display: flex; align-items: center; justify-content: center; padding: 0 10px 0 25px; cursor: pointer; color: rgba(255,255,255,0.6); transition: filter 0.2s; clip-path: polygon(0% 0%, calc(100% - 15px) 0%, 100% 50%, calc(100% - 15px) 100%, 0% 100%, 15px 50%); margin-right: -10px; }
         .phase-arrow:first-child { clip-path: polygon(0% 0%, calc(100% - 15px) 0%, 100% 50%, calc(100% - 15px) 100%, 0% 100%); padding-left: 15px; }
         .phase-arrow:hover { filter: brightness(1.2); z-index: 5; }
         .phase-arrow.active { color: #fff; filter: brightness(1.4); z-index: 10; }
-        
         .phase-title-text { font-size: 16px; font-weight: 700; letter-spacing: 0.3px; margin-bottom: 4px; }
-        .phase-percent { 
-            position: absolute; bottom: 3px; right: 25px; 
-            font-size: 11px; font-weight: 600; opacity: 0.9; 
-            font-family: var(--font-mono); background: rgba(0,0,0,0.3); 
-            padding: 0 4px; border-radius: 2px;
-        }
+        .phase-percent { position: absolute; bottom: 3px; right: 25px; font-size: 11px; font-weight: 600; opacity: 0.9; font-family: var(--font-mono); background: rgba(0,0,0,0.3); padding: 0 4px; border-radius: 2px; }
 
-        /* --- CONTENT --- */
+        /* CONTENT */
         .phase-content { flex: 1; padding: 24px; display: flex; flex-direction: column; gap: 24px; overflow-y: auto; }
-        
-        .main-link-card {
-            background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: var(--radius); padding: 16px 20px;
-            display: flex; align-items: center; gap: 16px;
-            cursor: pointer; transition: border-color 0.2s;
-        }
+        .main-link-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 20px; display: flex; align-items: center; gap: 16px; cursor: pointer; transition: border-color 0.2s; }
         .main-link-card:hover { border-color: #52525b; }
         .main-link-icon { font-size: 20px; background: var(--bg-hover); width: 40px; height: 40px; border-radius: 6px; display: flex; align-items: center; justify-content: center; }
         .main-link-info { flex: 1; overflow: hidden; }
-        
         .main-link-text { font-family: var(--font-mono); font-size: 14px; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .main-link-hint { font-size: 10px; color: var(--text-muted); opacity: 0.6; flex-shrink: 0; }
 
         .split-view { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; flex: 1; min-height: 0; }
         .panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); display: flex; flex-direction: column; overflow: hidden; }
-        .panel-header {
-            padding: 12px 16px; border-bottom: 1px solid var(--border);
-            display: flex; justify-content: space-between; align-items: center;
-            font-size: 11px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;
-            background: rgba(255,255,255,0.02);
-        }
-
+        .panel-header { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-size: 11px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; background: rgba(255,255,255,0.02); }
         .table-container { flex: 1; overflow-y: auto; }
-        .custom-table { width: 100%; border-collapse: collapse; }
+        
+        .custom-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         .custom-table tr { border-bottom: 1px solid var(--border); }
         .custom-table tr:last-child { border-bottom: none; }
-        .custom-table td { padding: 8px 12px; font-size: 12px; color: var(--text-muted); }
+        .custom-table td { padding: 8px 12px; font-size: 12px; color: var(--text-muted); vertical-align: top; }
         .custom-table tr:hover td { background: var(--bg-hover); color: var(--text-main); }
         
-        /* Drag handle cell */
         .drag-handle-cell { width: 24px; text-align: center; cursor: grab; color: #52525b; font-size: 14px; }
         .drag-handle-cell:hover { color: var(--text-main); }
         tr.dragging { opacity: 0.5; background: var(--bg-input) !important; }
 
-        .var-name { font-family: var(--font-mono); font-weight: 500; color: var(--text-main); width: 35%; }
-        .var-value { font-family: var(--font-mono); cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; color: #a1a1aa; }
+        .var-name { font-family: var(--font-mono); font-weight: 500; color: var(--text-main); width: 30%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .var-value { font-family: var(--font-mono); cursor: pointer; color: #a1a1aa; white-space: pre-wrap; word-break: break-word; max-width: 100%; display: block; }
         .var-value:hover { text-decoration: underline; color: #fff; }
         
         .task-row { cursor: pointer; }
         .task-check-cell { width: 30px; text-align: center; }
-        .task-checkbox {
-            width: 14px; height: 14px; border: 1px solid #52525b; border-radius: 3px;
-            display: inline-flex; align-items: center; justify-content: center;
-        }
+        .task-checkbox { width: 14px; height: 14px; border: 1px solid #52525b; border-radius: 3px; display: inline-flex; align-items: center; justify-content: center; }
         .task-row.completed .task-checkbox { background: #10b981; border-color: #10b981; color: #000; }
         .task-row.completed .task-desc { text-decoration: line-through; opacity: 0.5; }
-        .task-desc { line-height: 1.4; transition: color 0.2s; }
+        .task-desc { line-height: 1.4; transition: color 0.2s; white-space: pre-wrap; word-break: break-word;}
         .task-desc:hover { color: #fff; }
+        .task-link-cell { width: 26px; text-align: center; padding: 0 !important; vertical-align: middle !important; }
+        .btn-link-action { border: none; background: none; color: var(--text-muted); opacity: 0.6; cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; transition: all 0.2s; }
+        .btn-link-action:hover { opacity: 1; color: #fbbf24; transform: scale(1.1); }
 
         .action-cell { width: 30px; text-align: right; }
         .btn-mini { border: none; background: none; color: #ef4444; cursor: pointer; opacity: 0.4; font-size: 14px; }
         .btn-mini:hover { opacity: 1; }
 
-        /* Modals */
-        .modal-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.7);
-            display: flex; align-items: center; justify-content: center; z-index: 100;
-        }
-        .modal {
-            background: #18181b; border: 1px solid var(--border);
-            width: 420px; padding: 24px; border-radius: 8px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-        }
+        /* MODALS */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 100; }
+        .modal { background: #18181b; border: 1px solid var(--border); width: 420px; padding: 24px; border-radius: 8px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
         .modal-title { font-size: 15px; font-weight: 600; margin-bottom: 20px; color: var(--text-main); }
         .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 24px; }
-        
-        /* ESTILO ESPECIFICO PARA HACER MÁS ANCHO EL MODAL DE VARIABLES */
-        #modalVar .modal {
-            width: 840px; /* Doble de ancho */
-            max-width: 95vw;
-        }
+        #modalVar .modal { width: 840px; max-width: 95vw; }
 
         .hidden { display: none !important; }
         .empty-view { display: flex; align-items: center; justify-content: center; height: 100%; color: var(--text-muted); flex-direction: column; gap: 10px; }
 
-        /* Dragging Styles for Phases */
+        /* DRAGGING */
         .draggable-item { cursor: grab; background: var(--bg-hover); border-radius: 4px; padding: 8px; display: flex; align-items: center; gap: 8px; margin-bottom: 4px; user-select: none; }
         .draggable-item.dragging { opacity: 0.5; background: #27272a; }
         .drag-handle { cursor: grab; color: var(--text-muted); font-size: 16px; padding-right: 8px; }
 
-        /* TOAST NOTIFICATION */
-        .toast {
-            position: fixed; bottom: 20px; right: 20px;
-            background: var(--toast-bg); color: var(--toast-text);
-            padding: 8px 16px; border-radius: 4px; font-weight: 500; font-size: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            transform: translateY(100px); opacity: 0; transition: all 0.3s ease;
-            z-index: 200; pointer-events: none;
-        }
+        /* TOAST */
+        .toast { position: fixed; bottom: 20px; right: 20px; background: var(--toast-bg); color: var(--toast-text); padding: 8px 16px; border-radius: 4px; font-weight: 500; font-size: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); transform: translateY(100px); opacity: 0; transition: all 0.3s ease; z-index: 200; pointer-events: none; }
         .toast.visible { transform: translateY(0); opacity: 1; }
 
         ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -295,20 +146,15 @@
         <span class="app-brand">FLOWBOARD</span>
         <span class="entity-name" id="currentEntityDisplay" onclick="openEntityModal()" title="Cambiar Entidad">Cargando...</span>
     </div>
-    
     <div class="search-create-box">
         <div class="input-group">
             <input type="text" id="projectInput" placeholder="Buscar o crear..." autocomplete="off">
             <button class="btn btn-primary" onclick="handleCreateBtn()" title="Crear">+</button>
         </div>
     </div>
-
     <div class="projects-list" id="projectsList"></div>
-
     <div class="config-footer">
-        <button class="btn btn-block" onclick="openModal('modalPhases', 'newPhaseName'); renderGlobalPhasesList();">
-            FASES
-        </button>
+        <button class="btn btn-block" onclick="openModal('modalPhases', 'newPhaseName'); renderGlobalPhasesList();">FASES</button>
         <div class="data-actions">
             <button class="btn" style="flex:1" onclick="exportData()">EXPORTAR</button>
             <button class="btn" style="flex:1" onclick="document.getElementById('importFile').click()">IMPORTAR</button>
@@ -322,28 +168,17 @@
         <div style="font-size: 32px; opacity: 0.2;">⌘</div>
         <p>Selecciona un proyecto</p>
     </div>
-
     <div id="projectArea" class="hidden" style="display: flex; flex-direction: column; height: 100%;">
         <header class="top-bar">
             <span id="projectTitle" class="project-title" onclick="handleProjectTitleClick(event)" title="Shift+Click para renombrar"></span>
-            
             <div class="header-actions">
-                <button id="btnTemplateToggle" class="btn-header template" onclick="toggleTemplateStatus()">
-                    Hacer Plantilla
-                </button>
-                <button class="btn-header clone" onclick="cloneProject()">
-                    Clonar
-                </button>
-                <button class="btn-header delete" onclick="deleteProject()">
-                    Eliminar
-                </button>
+                <button id="btnTemplateToggle" class="btn-header template" onclick="toggleTemplateStatus()">Hacer Plantilla</button>
+                <button class="btn-header clone" onclick="cloneProject()">Clonar</button>
+                <button class="btn-header delete" onclick="deleteProject()">Eliminar</button>
             </div>
         </header>
-
         <div id="processBar" class="process-bar"></div>
-
         <div id="contentArea" class="phase-content">
-            
             <div class="main-link-card" onclick="handleMainLinkClick(event)">
                 <div class="main-link-icon">🔗</div>
                 <div class="main-link-info">
@@ -351,9 +186,7 @@
                 </div>
                 <div class="main-link-hint">Shift+Click para editar</div>
             </div>
-
             <div class="split-view">
-                
                 <div class="panel">
                     <div class="panel-header">
                         Tareas
@@ -363,7 +196,6 @@
                         <table class="custom-table" id="tasksTable"></table>
                     </div>
                 </div>
-
                 <div class="panel">
                     <div class="panel-header">
                         Variables (Datos)
@@ -373,7 +205,6 @@
                         <table class="custom-table" id="varsTable"></table>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
@@ -397,8 +228,7 @@
 <div id="modalPhases" class="modal-overlay hidden">
     <div class="modal">
         <div class="modal-title">Gestor de Fases</div>
-        <div id="globalPhasesList" style="margin-bottom: 16px; max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px;">
-            </div>
+        <div id="globalPhasesList" style="margin-bottom: 16px; max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px;"></div>
         <div class="input-group">
             <input type="text" id="newPhaseName" placeholder="Nueva fase...">
             <button class="btn btn-primary" onclick="addGlobalPhase()">Añadir</button>
@@ -413,7 +243,9 @@
     <div class="modal">
         <div class="modal-title">Tarea</div>
         <input type="hidden" id="taskEditIndex">
-        <input type="text" id="newTaskInput" placeholder="Descripción de la tarea...">
+        <input type="text" id="newTaskInput" placeholder="Descripción de la tarea..." style="margin-bottom: 12px;">
+        <label style="font-size:11px; color:var(--text-muted); margin-bottom:4px; display:block;">Variable asociada (Opcional)</label>
+        <select id="taskVarSelect"><option value="">-- Sin variable asociada --</option></select>
         <div class="modal-actions">
             <button class="btn" style="color: #ef4444; margin-right:auto;" onclick="deleteTaskFromModal()">Borrar</button>
             <button class="btn" onclick="closeModal('modalTask')">Cancelar</button>
@@ -481,703 +313,292 @@
 </div>
 
 <script>
-    // --- MULTI-ENTITY STATE ---
     let currentEntity = null;
     let data = { globalPhases: [], projects: [], lastProject: null, lastPhase: null };
 
-    // --- STARTUP LOGIC ---
     document.addEventListener('DOMContentLoaded', () => {
         const lastEntity = localStorage.getItem('flowboard_last_entity');
-        if (lastEntity) loadEntity(lastEntity);
-        else openEntityModal();
-        
+        if (lastEntity) loadEntity(lastEntity); else openEntityModal();
         setupDragAndDrop();
     });
 
-    function openEntityModal() {
-        document.getElementById('entityInput').value = '';
-        document.getElementById('modalEntity').classList.remove('hidden');
-        setTimeout(() => document.getElementById('entityInput').focus(), 100);
-    }
-
-    function setEntity() {
-        const name = document.getElementById('entityInput').value.trim();
-        if(name) {
-            loadEntity(name);
-            document.getElementById('modalEntity').classList.add('hidden');
-        }
-    }
-
+    function openEntityModal() { document.getElementById('entityInput').value = ''; document.getElementById('modalEntity').classList.remove('hidden'); setTimeout(() => document.getElementById('entityInput').focus(), 100); }
+    function setEntity() { const name = document.getElementById('entityInput').value.trim(); if(name) { loadEntity(name); document.getElementById('modalEntity').classList.add('hidden'); } }
     function loadEntity(name) {
-        currentEntity = name;
-        localStorage.setItem('flowboard_last_entity', name);
-        document.getElementById('currentEntityDisplay').textContent = name;
-        document.title = `FLOWBOARD - ${name}`;
-        
-        const dbKey = `flowboard_db_${name}`;
-        const saved = localStorage.getItem(dbKey);
-        if(saved) data = JSON.parse(saved);
-        else data = { globalPhases: [], projects: [], lastProject: null, lastPhase: null };
-        
-        document.getElementById('projectInput').value = '';
-        renderProjectList();
-        if (data.lastProject) selectProject(data.lastProject);
-        else renderMainView();
+        currentEntity = name; localStorage.setItem('flowboard_last_entity', name);
+        document.getElementById('currentEntityDisplay').textContent = name; document.title = `FLOWBOARD - ${name}`;
+        const dbKey = `flowboard_db_${name}`; const saved = localStorage.getItem(dbKey);
+        if(saved) data = JSON.parse(saved); else data = { globalPhases: [], projects: [], lastProject: null, lastPhase: null };
+        ensureIds(); document.getElementById('projectInput').value = ''; renderProjectList();
+        if (data.lastProject) selectProject(data.lastProject); else renderMainView();
     }
-
-    function save() {
-        if(!currentEntity) return;
-        const dbKey = `flowboard_db_${currentEntity}`;
-        localStorage.setItem(dbKey, JSON.stringify(data));
-        renderProjectList(document.getElementById('projectInput').value);
-
-        // Auto Backup
-        const today = new Date().toISOString().slice(0, 10);
-        const lastBackupKey = `flowboard_last_backup_${currentEntity}`;
-        const lastBackup = localStorage.getItem(lastBackupKey);
-        if (lastBackup !== today) {
-            exportData();
-            localStorage.setItem(lastBackupKey, today);
-            showToast("Backup diario automático realizado");
-        }
-    }
-
-    // --- GLOBAL EVENTS ---
-    document.addEventListener('keydown', (e) => {
-        if(e.key === 'Escape') {
-            if(!document.getElementById('modalEntity').classList.contains('hidden') && !currentEntity) return;
-            document.querySelectorAll('.modal-overlay').forEach(el => el.classList.add('hidden'));
-        }
-    });
-
-    ['projectInput', 'newPhaseName', 'newTaskInput', 'varName', 'varValue', 'mainLinkUrlInput', 'entityInput', 'renameProjectInput'].forEach(id => {
-        const el = document.getElementById(id);
-        if(el) {
-            el.addEventListener('keydown', (e) => {
-                if(e.key === 'Enter') {
-                    if(id === 'entityInput') setEntity();
-                    if(id === 'projectInput') handleCreateBtn();
-                    if(id === 'newPhaseName') addGlobalPhase();
-                    if(id === 'newTaskInput') saveTask();
-                    if(id === 'varName' || id === 'varValue') saveVar();
-                    if(id.startsWith('mainLink')) saveMainLink();
-                    if(id === 'renameProjectInput') saveProjectRename();
-                }
-            });
-        }
-    });
-
-    const fileArea = document.getElementById('varFileContent');
-    if(fileArea) {
-        fileArea.addEventListener('keydown', (e) => {
-            if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); saveVar(); }
-        });
-    }
-
-    document.getElementById('projectInput').addEventListener('input', (e) => renderProjectList(e.target.value));
-
-    // --- UTILS ---
-    function fixUrl(url) {
-        url = url.trim();
-        if(!url) return '';
-        if (!/^https?:\/\//i.test(url)) {
-            if (url.startsWith('localhost') || url.startsWith('127.0.0.1')) return 'http://' + url;
-            return 'https://' + url;
-        }
-        return url;
-    }
-
-    function getColorForPercent(pct) {
-        if(pct === 0) return 'var(--col-0)'; 
-        if(pct === 100) return 'var(--col-100)'; 
-        return 'var(--col-50)';
-    }
-
-    function showToast(msg) {
-        const t = document.getElementById('toast');
-        t.innerText = msg;
-        t.classList.add('visible');
-        setTimeout(() => t.classList.remove('visible'), 2000);
-    }
-
-    // --- DATA ACTIONS ---
-    function exportData() {
-        const str = JSON.stringify(data, null, 2);
-        const blob = new Blob([str], {type: 'application/json'});
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        const dateStr = new Date().toISOString().slice(0,10);
-        const safeEntity = currentEntity.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-        a.download = `flowboard_${safeEntity}_backup_${dateStr}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
-    }
-
-    function importData(e) {
-        const file = e.target.files[0];
-        if(!file) return;
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            try {
-                const imported = JSON.parse(event.target.result);
-                if(confirm(`¿Importar datos en "${currentEntity}"? Se sobrescribirán ${data.projects.length} proyectos.`)) {
-                    data = imported;
-                    save();
-                    location.reload();
-                }
-            } catch(err) { alert('Error JSON.'); }
-        };
-        reader.readAsText(file);
-        e.target.value = '';
-    }
-
-    // --- CORE LOGIC ---
-    function handleCreateBtn() {
-        const val = document.getElementById('projectInput').value.trim();
-        if(!val) return;
-        const exists = data.projects.find(p => p.name.toLowerCase() === val.toLowerCase());
-        if(exists) selectProject(exists.id);
-        else createProject(val);
-    }
-
-    function createProject(name) {
-        const template = data.projects.find(p => p.isTemplate);
-        const newProj = {
-            id: crypto.randomUUID(),
-            name: name,
-            isTemplate: false,
-            phaseData: template ? JSON.parse(JSON.stringify(template.phaseData)) : {}
-        };
-        data.projects.push(newProj);
-        save();
-        document.getElementById('projectInput').value = '';
-        renderProjectList();
-        selectProject(newProj.id);
-    }
-
-    function cloneProject() {
-        const p = getCurrentProject();
-        if(!p) return;
-        const newProj = JSON.parse(JSON.stringify(p));
-        newProj.id = crypto.randomUUID();
-        newProj.name = p.name + " (Copia)";
-        newProj.isTemplate = false;
-        data.projects.push(newProj);
-        save();
-        renderProjectList();
-        selectProject(newProj.id);
-        showToast("Proyecto clonado");
-    }
-
-    function selectProject(id) {
-        data.lastProject = id;
-        save();
-        renderMainView();
-        document.querySelectorAll('.project-item').forEach(el => el.classList.remove('active'));
-        const el = document.getElementById(`proj-${id}`);
-        if(el) el.classList.add('active');
-    }
-
-    function getCurrentProject() { return data.projects.find(p => p.id === data.lastProject); }
-
-    function getPhaseData(proj, phaseId) {
-        if(!proj) return null;
-        if(!proj.phaseData) proj.phaseData = {};
-        if(!proj.phaseData[phaseId]) proj.phaseData[phaseId] = { tasks: [], vars: [], mainLink: null };
-        return proj.phaseData[phaseId];
-    }
-
-    function toggleTemplateStatus() {
-        const p = getCurrentProject();
-        if(!p) return;
-        if(!p.isTemplate) data.projects.forEach(proj => proj.isTemplate = false);
-        p.isTemplate = !p.isTemplate;
-        save();
-        renderMainView();
-    }
-
-    function deleteProject() {
-        if(!confirm('¿Eliminar proyecto?')) return;
-        data.projects = data.projects.filter(p => p.id !== data.lastProject);
-        data.lastProject = null;
-        save();
-        renderProjectList();
-        renderMainView();
-    }
-
-    function handleProjectTitleClick(e) {
-        if(e.shiftKey) {
-            const p = getCurrentProject();
-            if(p) {
-                document.getElementById('renameProjectInput').value = p.name;
-                openModal('modalRenameProject', 'renameProjectInput');
-            }
-        }
-    }
-
-    function saveProjectRename() {
-        const newName = document.getElementById('renameProjectInput').value.trim();
-        if(newName) {
-            getCurrentProject().name = newName;
-            save();
-            renderMainView();
-            closeModal('modalRenameProject');
-        }
-    }
-
-    // --- DRAG AND DROP FASES (NO LIBS) ---
-    function setupDragAndDrop() {
-        const container = document.getElementById('globalPhasesList');
-        
-        container.addEventListener('dragstart', (e) => {
-            e.target.classList.add('dragging');
-            e.dataTransfer.effectAllowed = 'move';
-        });
-
-        container.addEventListener('dragend', (e) => {
-            e.target.classList.remove('dragging');
-            updateGlobalPhasesOrder();
-        });
-
-        container.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            const afterElement = getDragAfterElement(container, e.clientY);
-            const draggable = document.querySelector('#globalPhasesList .dragging');
-            if (afterElement == null) {
-                container.appendChild(draggable);
-            } else {
-                container.insertBefore(draggable, afterElement);
-            }
-        });
-    }
-
-    function getDragAfterElement(container, y) {
-        const draggableElements = [...container.querySelectorAll('.draggable-item:not(.dragging)')];
-        
-        return draggableElements.reduce((closest, child) => {
-            const box = child.getBoundingClientRect();
-            const offset = y - box.top - box.height / 2;
-            if (offset < 0 && offset > closest.offset) {
-                return { offset: offset, element: child };
-            } else {
-                return closest;
-            }
-        }, { offset: Number.NEGATIVE_INFINITY }).element;
-    }
-
-    function updateGlobalPhasesOrder() {
-        const container = document.getElementById('globalPhasesList');
-        const newOrderIds = [...container.querySelectorAll('.draggable-item')].map(el => el.getAttribute('data-id'));
-        
-        const newPhases = [];
-        newOrderIds.forEach(id => {
-            const phase = data.globalPhases.find(p => p.id === id);
-            if(phase) newPhases.push(phase);
-        });
-        
-        data.globalPhases = newPhases;
-        save();
-        renderPhaseTabs();
-    }
-
-    // --- TABLE DND (TASKS & VARS) ---
-    function setupTableDragAndDrop(tableId, updateCallback) {
-        const container = document.getElementById(tableId);
-        let draggedItem = null;
-
-        container.addEventListener('dragstart', (e) => {
-            draggedItem = e.target.closest('tr');
-            if(draggedItem) draggedItem.classList.add('dragging');
-        });
-
-        container.addEventListener('dragend', (e) => {
-            if(draggedItem) draggedItem.classList.remove('dragging');
-            updateCallback();
-        });
-
-        container.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            const afterElement = getTableDragAfterElement(container, e.clientY);
-            const draggable = document.querySelector(`#${tableId} .dragging`);
-            if (afterElement == null) container.appendChild(draggable);
-            else container.insertBefore(draggable, afterElement);
-        });
-    }
-
-    function getTableDragAfterElement(container, y) {
-        const draggableElements = [...container.querySelectorAll('tr:not(.dragging)')];
-        return draggableElements.reduce((closest, child) => {
-            const box = child.getBoundingClientRect();
-            const offset = y - box.top - box.height / 2;
-            if (offset < 0 && offset > closest.offset) return { offset: offset, element: child };
-            else return closest;
-        }, { offset: Number.NEGATIVE_INFINITY }).element;
-    }
-    
-    // Auto-generate IDs on load
-    const originalLoadEntity = loadEntity;
-    loadEntity = function(name) {
-        originalLoadEntity(name);
+    function ensureIds() {
         data.projects.forEach(p => {
             for(let phase in p.phaseData) {
                 p.phaseData[phase].tasks.forEach(t => { if(!t.id) t.id = crypto.randomUUID(); });
                 p.phaseData[phase].vars.forEach(v => { if(!v.id) v.id = crypto.randomUUID(); });
             }
         });
-    };
-
-    function updateTaskOrderFinal() {
-        const container = document.getElementById('tasksTable');
-        const ids = [...container.querySelectorAll('tr')].map(row => row.getAttribute('data-id'));
-        const d = getPhaseData(getCurrentProject(), data.lastPhase);
-        
-        const newArr = [];
-        ids.forEach(id => {
-            const item = d.tasks.find(t => t.id === id);
-            if(item) newArr.push(item);
-        });
-        d.tasks = newArr;
-        save();
-        renderPhaseContent(); 
+    }
+    function save() {
+        if(!currentEntity) return;
+        localStorage.setItem(`flowboard_db_${currentEntity}`, JSON.stringify(data));
+        renderProjectList(document.getElementById('projectInput').value);
+        const today = new Date().toISOString().slice(0, 10);
+        const lastBackupKey = `flowboard_last_backup_${currentEntity}`;
+        if (localStorage.getItem(lastBackupKey) !== today) { exportData(); localStorage.setItem(lastBackupKey, today); showToast("Backup automático"); }
     }
 
-    function updateVarOrderFinal() {
-        const container = document.getElementById('varsTable');
-        const ids = [...container.querySelectorAll('tr')].map(row => row.getAttribute('data-id'));
-        const d = getPhaseData(getCurrentProject(), data.lastPhase);
-        
-        const newArr = [];
-        ids.forEach(id => {
-            const item = d.vars.find(v => v.id === id);
-            if(item) newArr.push(item);
+    // --- EVENTS ---
+    document.addEventListener('keydown', (e) => { if(e.key === 'Escape') { if(!document.getElementById('modalEntity').classList.contains('hidden') && !currentEntity) return; document.querySelectorAll('.modal-overlay').forEach(el => el.classList.add('hidden')); } });
+    ['projectInput', 'newPhaseName', 'newTaskInput', 'varName', 'varValue', 'mainLinkUrlInput', 'entityInput', 'renameProjectInput'].forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.addEventListener('keydown', (e) => {
+            if(e.key === 'Enter') {
+                if(id === 'entityInput') setEntity();
+                if(id === 'projectInput') handleCreateBtn();
+                if(id === 'newPhaseName') addGlobalPhase();
+                if(id === 'newTaskInput') saveTask();
+                if(id === 'varName' || id === 'varValue') saveVar();
+                if(id.startsWith('mainLink')) saveMainLink();
+                if(id === 'renameProjectInput') saveProjectRename();
+            }
         });
-        d.vars = newArr;
-        save();
-        renderPhaseContent();
+    });
+    const fileArea = document.getElementById('varFileContent');
+    if(fileArea) fileArea.addEventListener('keydown', (e) => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); saveVar(); } });
+    document.getElementById('projectInput').addEventListener('input', (e) => renderProjectList(e.target.value));
+
+    // --- JS EXECUTION ENGINE ---
+    function evaluateAllVars(vars) {
+        // First pass: context from text/url
+        const ctx = {};
+        vars.forEach(v => { if (v.type !== 'js') ctx[v.name] = v.value || ''; });
+        
+        // Second pass: run JS. We iterate twice to allow some dependency chaining
+        for(let i=0; i<2; i++) {
+            vars.forEach(v => {
+                if (v.type === 'js') {
+                    try { const fn = new Function('vars', v.script); v.value = String(fn(ctx)); } 
+                    catch(e) { v.value = "Error: " + e.message; }
+                    ctx[v.name] = v.value; // Update context for subsequent vars
+                }
+            });
+        }
     }
+
+    // --- CORE LOGIC ---
+    function fixUrl(url) { url = url.trim(); if(!url) return ''; if (!/^https?:\/\//i.test(url)) { if (url.startsWith('localhost') || url.startsWith('127.0.0.1')) return 'http://' + url; return 'https://' + url; } return url; }
+    function getColorForPercent(pct) { if(pct === 0) return 'var(--col-0)'; if(pct === 100) return 'var(--col-100)'; return 'var(--col-50)'; }
+    function showToast(msg) { const t = document.getElementById('toast'); t.innerText = msg; t.classList.add('visible'); setTimeout(() => t.classList.remove('visible'), 2000); }
+    function exportData() { const str = JSON.stringify(data, null, 2); const blob = new Blob([str], {type: 'application/json'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `flowboard_${currentEntity.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.json`; a.click(); URL.revokeObjectURL(url); }
+    function importData(e) { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = (event) => { try { const imported = JSON.parse(event.target.result); if(confirm(`¿Importar?`)) { data = imported; save(); location.reload(); } } catch(err) { alert('Error JSON'); } }; reader.readAsText(file); e.target.value = ''; }
+    function handleCreateBtn() { const val = document.getElementById('projectInput').value.trim(); if(!val) return; const exists = data.projects.find(p => p.name.toLowerCase() === val.toLowerCase()); if(exists) selectProject(exists.id); else createProject(val); }
+    function createProject(name) { const template = data.projects.find(p => p.isTemplate); const newProj = { id: crypto.randomUUID(), name: name, isTemplate: false, phaseData: template ? JSON.parse(JSON.stringify(template.phaseData)) : {} }; data.projects.push(newProj); save(); document.getElementById('projectInput').value = ''; renderProjectList(); selectProject(newProj.id); }
+    function cloneProject() { const p = getCurrentProject(); if(!p) return; const newProj = JSON.parse(JSON.stringify(p)); newProj.id = crypto.randomUUID(); newProj.name = p.name + " (Copia)"; newProj.isTemplate = false; data.projects.push(newProj); save(); renderProjectList(); selectProject(newProj.id); showToast("Clonado"); }
+    function selectProject(id) { data.lastProject = id; save(); renderMainView(); document.querySelectorAll('.project-item').forEach(el => el.classList.remove('active')); const el = document.getElementById(`proj-${id}`); if(el) el.classList.add('active'); }
+    function getCurrentProject() { return data.projects.find(p => p.id === data.lastProject); }
+    function getPhaseData(proj, phaseId) { if(!proj) return null; if(!proj.phaseData) proj.phaseData = {}; if(!proj.phaseData[phaseId]) proj.phaseData[phaseId] = { tasks: [], vars: [], mainLink: null }; return proj.phaseData[phaseId]; }
+    function toggleTemplateStatus() { const p = getCurrentProject(); if(!p) return; if(!p.isTemplate) data.projects.forEach(proj => proj.isTemplate = false); p.isTemplate = !p.isTemplate; save(); renderMainView(); }
+    function deleteProject() { if(!confirm('¿Eliminar?')) return; data.projects = data.projects.filter(p => p.id !== data.lastProject); data.lastProject = null; save(); renderProjectList(); renderMainView(); }
+    function handleProjectTitleClick(e) { if(e.shiftKey) { const p = getCurrentProject(); if(p) { document.getElementById('renameProjectInput').value = p.name; openModal('modalRenameProject', 'renameProjectInput'); } } }
+    function saveProjectRename() { const newName = document.getElementById('renameProjectInput').value.trim(); if(newName) { getCurrentProject().name = newName; save(); renderMainView(); closeModal('modalRenameProject'); } }
 
     // --- RENDER ---
     function renderProjectList(filter = '') {
-        const list = document.getElementById('projectsList');
-        list.innerHTML = '';
+        const list = document.getElementById('projectsList'); list.innerHTML = '';
         const filtered = data.projects.filter(p => p.name.toLowerCase().includes(filter.toLowerCase()));
         filtered.forEach(p => {
-            const div = document.createElement('div');
-            div.className = `project-item ${p.id === data.lastProject ? 'active' : ''}`;
-            div.id = `proj-${p.id}`;
-            div.onclick = () => selectProject(p.id);
-            div.innerHTML = `<span>${p.name}</span>${p.isTemplate ? '<span class="template-badge">Plantilla</span>' : ''}`;
-            list.appendChild(div);
+            const div = document.createElement('div'); div.className = `project-item ${p.id === data.lastProject ? 'active' : ''}`; div.id = `proj-${p.id}`; div.onclick = () => selectProject(p.id);
+            div.innerHTML = `<span>${p.name}</span>${p.isTemplate ? '<span class="template-badge">Plantilla</span>' : ''}`; list.appendChild(div);
         });
     }
 
     function renderMainView() {
-        const p = getCurrentProject();
-        const noProj = document.getElementById('noProject');
-        const view = document.getElementById('projectArea');
-        if(!p) {
-            noProj.classList.remove('hidden');
-            view.classList.add('hidden');
-            return;
-        }
-        noProj.classList.add('hidden');
-        view.classList.remove('hidden');
+        const p = getCurrentProject(); const noProj = document.getElementById('noProject'); const view = document.getElementById('projectArea');
+        if(!p) { noProj.classList.remove('hidden'); view.classList.add('hidden'); return; }
+        noProj.classList.add('hidden'); view.classList.remove('hidden');
         document.getElementById('projectTitle').textContent = p.name;
-        
         const tBtn = document.getElementById('btnTemplateToggle');
-        if(p.isTemplate) {
-            tBtn.classList.add('active'); tBtn.innerText = 'Es Plantilla';
-        } else {
-            tBtn.classList.remove('active'); tBtn.innerText = 'Hacer Plantilla';
-        }
+        if(p.isTemplate) { tBtn.classList.add('active'); tBtn.innerText = 'Es Plantilla'; } else { tBtn.classList.remove('active'); tBtn.innerText = 'Hacer Plantilla'; }
         renderPhaseTabs();
     }
 
     function renderPhaseTabs() {
-        const bar = document.getElementById('processBar');
-        bar.innerHTML = '';
-        const contentArea = document.getElementById('contentArea');
-
-        if(data.globalPhases.length === 0) {
-            bar.innerHTML = '<div style="padding:0 12px; font-size:12px; color:var(--text-muted);">Configura las fases en la barra lateral</div>';
-            contentArea.classList.add('hidden');
-            return;
-        }
+        const bar = document.getElementById('processBar'); bar.innerHTML = ''; const contentArea = document.getElementById('contentArea');
+        if(data.globalPhases.length === 0) { bar.innerHTML = '<div style="padding:0 12px; font-size:12px; color:var(--text-muted);">Configura las fases en la barra lateral</div>'; contentArea.classList.add('hidden'); return; }
         contentArea.classList.remove('hidden');
-
-        if(!data.lastPhase || !data.globalPhases.find(gp => gp.id === data.lastPhase)) {
-            data.lastPhase = data.globalPhases[0].id;
-        }
-
+        if(!data.lastPhase || !data.globalPhases.find(gp => gp.id === data.lastPhase)) data.lastPhase = data.globalPhases[0].id;
         const p = getCurrentProject();
-
         data.globalPhases.forEach(gp => {
-            let progressColor = 'var(--col-0)';
-            let percent = 0;
-            let hasTasks = false;
+            let progressColor = 'var(--col-0)'; let percent = 0; let hasTasks = false;
             if(p.phaseData && p.phaseData[gp.id] && p.phaseData[gp.id].tasks) {
                 const tasks = p.phaseData[gp.id].tasks;
-                if(tasks.length > 0) {
-                    hasTasks = true;
-                    const completed = tasks.filter(t => t.done).length;
-                    percent = Math.round((completed / tasks.length) * 100);
-                    progressColor = getColorForPercent(percent);
-                }
+                if(tasks.length > 0) { hasTasks = true; const completed = tasks.filter(t => t.done).length; percent = Math.round((completed / tasks.length) * 100); progressColor = getColorForPercent(percent); }
             }
-            const arrow = document.createElement('div');
-            arrow.className = `phase-arrow ${gp.id === data.lastPhase ? 'active' : ''}`;
+            const arrow = document.createElement('div'); arrow.className = `phase-arrow ${gp.id === data.lastPhase ? 'active' : ''}`;
             arrow.innerHTML = `<span class="phase-title-text">${gp.name}</span>${hasTasks ? `<span class="phase-percent">${percent}%</span>` : ''}`;
-            arrow.style.backgroundColor = progressColor;
-            arrow.onclick = () => { data.lastPhase = gp.id; save(); renderMainView(); };
+            arrow.style.backgroundColor = progressColor; arrow.onclick = () => { data.lastPhase = gp.id; save(); renderMainView(); };
             bar.appendChild(arrow);
         });
         renderPhaseContent();
     }
 
     function renderPhaseContent() {
-        const p = getCurrentProject();
-        const d = getPhaseData(p, data.lastPhase);
-        if(!d) return;
-
-        // Ensure IDs exist for DnD
-        if(d.tasks.some(t => !t.id)) d.tasks.forEach(t => { if(!t.id) t.id = crypto.randomUUID(); });
-        if(d.vars.some(v => !v.id)) d.vars.forEach(v => { if(!v.id) v.id = crypto.randomUUID(); });
+        const p = getCurrentProject(); const d = getPhaseData(p, data.lastPhase); if(!d) return;
+        
+        // --- REACTIVITY: EXECUTE JS ---
+        evaluateAllVars(d.vars);
 
         const linkText = document.getElementById('mainLinkText');
-        if(d.mainLink && d.mainLink.url) {
-            linkText.textContent = d.mainLink.url;
-            linkText.style.opacity = '1';
-        } else {
-            linkText.textContent = 'Configurar URL';
-            linkText.style.opacity = '0.5';
-        }
+        if(d.mainLink && d.mainLink.url) { linkText.textContent = d.mainLink.url; linkText.style.opacity = '1'; } 
+        else { linkText.textContent = 'Configurar URL'; linkText.style.opacity = '0.5'; }
 
-        const tasksTable = document.getElementById('tasksTable');
-        tasksTable.innerHTML = '';
+        const tasksTable = document.getElementById('tasksTable'); tasksTable.innerHTML = '';
         d.tasks.forEach((t, idx) => {
-            const tr = document.createElement('tr');
-            tr.className = `task-row ${t.done ? 'completed' : ''}`;
-            tr.setAttribute('draggable', 'true');
-            tr.setAttribute('data-id', t.id); // Using ID for robust DnD
-            tr.innerHTML = `
-                <td class="drag-handle-cell">⋮⋮</td>
-                <td class="task-check-cell" onclick="toggleTask(${idx})"><div class="task-checkbox">${t.done ? '✓' : ''}</div></td>
-                <td class="task-desc" onclick="handleTaskClick(${idx}, event)">${t.desc}</td>
-                <td class="action-cell"><button class="btn-mini" onclick="deleteTask(${idx})">×</button></td>
-            `;
+            const tr = document.createElement('tr'); tr.className = `task-row ${t.done ? 'completed' : ''}`; tr.setAttribute('draggable', 'true'); tr.setAttribute('data-id', t.id);
+            let varIconHtml = '';
+            if(t.linkedVarId) {
+                const vIndex = d.vars.findIndex(v => v.id === t.linkedVarId);
+                if(vIndex >= 0) {
+                    const v = d.vars[vIndex];
+                    let icon = '⚡'; if(v.type === 'text') icon = 'T'; if(v.type === 'url') icon = '🔗'; if(v.type === 'file') icon = '📄';
+                    varIconHtml = `<button class="btn-link-action" title="Ejecutar/Copiar variable: ${v.name}" onclick="handleVarClick(${vIndex}, event)">${icon}</button>`;
+                }
+            }
+            tr.innerHTML = `<td class="drag-handle-cell">⋮⋮</td><td class="task-link-cell">${varIconHtml}</td><td class="task-check-cell" onclick="toggleTask(${idx})"><div class="task-checkbox">${t.done ? '✓' : ''}</div></td><td class="task-desc" onclick="handleTaskClick(${idx}, event)">${t.desc}</td><td class="action-cell"><button class="btn-mini" onclick="deleteTask(${idx})">×</button></td>`;
             tasksTable.appendChild(tr);
         });
 
-        const varsTable = document.getElementById('varsTable');
-        varsTable.innerHTML = '';
+        const varsTable = document.getElementById('varsTable'); varsTable.innerHTML = '';
         d.vars.forEach((v, idx) => {
-            const tr = document.createElement('tr');
-            tr.setAttribute('draggable', 'true');
-            tr.setAttribute('data-id', v.id);
-            let typeIcon = 'T';
-            let displayVal = v.value || '...';
-            if(v.type === 'url') typeIcon = '🔗';
-            if(v.type === 'js') typeIcon = '⚡';
-            if(v.type === 'file') { typeIcon = '📄'; displayVal = 'Copiar fichero'; }
-
-            tr.innerHTML = `
-                <td class="drag-handle-cell">⋮⋮</td>
-                <td class="var-name"><span style="opacity:0.5; margin-right:4px;">${typeIcon}</span> ${v.name}</td>
-                <td><div class="var-value" onclick="handleVarClick(${idx}, event)">${displayVal}</div></td>
-            `;
+            const tr = document.createElement('tr'); tr.setAttribute('draggable', 'true'); tr.setAttribute('data-id', v.id);
+            let typeIcon = 'T'; let displayVal = v.value || '...';
+            if(v.type === 'url') typeIcon = '🔗'; if(v.type === 'js') typeIcon = '⚡'; if(v.type === 'file') { typeIcon = '📄'; displayVal = 'Copiar fichero'; }
+            tr.innerHTML = `<td class="drag-handle-cell">⋮⋮</td><td class="var-name"><span style="opacity:0.5; margin-right:4px;">${typeIcon}</span> ${v.name}</td><td><div class="var-value" onclick="handleVarClick(${idx}, event)">${displayVal}</div></td>`;
             varsTable.appendChild(tr);
         });
-
-        // Initialize DnD Listeners for these tables
-        setupTableDragAndDrop('tasksTable', updateTaskOrderFinal);
-        setupTableDragAndDrop('varsTable', updateVarOrderFinal);
+        setupTableDragAndDrop('tasksTable', updateTaskOrderFinal); setupTableDragAndDrop('varsTable', updateVarOrderFinal);
     }
 
-    // ... (Rest of actions same as before) ...
-    // --- ACTIONS (LINK, VARS, TASKS) ---
-    function handleMainLinkClick(e) {
-        if(e.shiftKey) openMainLinkModal();
-        else {
-            const d = getPhaseData(getCurrentProject(), data.lastPhase);
-            if(d.mainLink && d.mainLink.url) window.open(fixUrl(d.mainLink.url), '_blank');
-            else openMainLinkModal();
-        }
-    }
-    function openMainLinkModal() {
-        const d = getPhaseData(getCurrentProject(), data.lastPhase);
-        document.getElementById('mainLinkUrlInput').value = d.mainLink ? d.mainLink.url : '';
-        openModal('modalMainLink', 'mainLinkUrlInput');
-    }
-    function saveMainLink() {
-        getPhaseData(getCurrentProject(), data.lastPhase).mainLink = { url: document.getElementById('mainLinkUrlInput').value };
-        save(); closeModal('modalMainLink'); renderPhaseContent();
-    }
+    // --- ACTIONS ---
+    function handleMainLinkClick(e) { if(e.shiftKey) openMainLinkModal(); else { const d = getPhaseData(getCurrentProject(), data.lastPhase); if(d.mainLink && d.mainLink.url) window.open(fixUrl(d.mainLink.url), '_blank'); else openMainLinkModal(); } }
+    function openMainLinkModal() { const d = getPhaseData(getCurrentProject(), data.lastPhase); document.getElementById('mainLinkUrlInput').value = d.mainLink ? d.mainLink.url : ''; openModal('modalMainLink', 'mainLinkUrlInput'); }
+    function saveMainLink() { getPhaseData(getCurrentProject(), data.lastPhase).mainLink = { url: document.getElementById('mainLinkUrlInput').value }; save(); closeModal('modalMainLink'); renderPhaseContent(); }
 
     function openVarModal(idx = -1) {
-        document.getElementById('varEditIndex').value = idx;
-        const d = getPhaseData(getCurrentProject(), data.lastPhase);
+        document.getElementById('varEditIndex').value = idx; const d = getPhaseData(getCurrentProject(), data.lastPhase);
         const v = idx >= 0 ? d.vars[idx] : {name:'', type:'text', value:'', script:'', fileContent:''};
-        
-        document.getElementById('varName').value = v.name;
-        document.getElementById('varType').value = v.type;
-        document.getElementById('varValue').value = v.value || '';
-        document.getElementById('varScript').value = v.script || '';
-        document.getElementById('varFileContent').value = v.fileContent || '';
-        
-        updateVarModalUI();
-        openModal('modalVar', 'varName');
+        document.getElementById('varName').value = v.name; document.getElementById('varType').value = v.type; document.getElementById('varValue').value = v.value || ''; document.getElementById('varScript').value = v.script || ''; document.getElementById('varFileContent').value = v.fileContent || '';
+        updateVarModalUI(); openModal('modalVar', 'varName');
     }
 
     function updateVarModalUI() {
-        const type = document.getElementById('varType').value;
-        const valIn = document.getElementById('varValue');
-        const scriptArea = document.getElementById('varScriptGroup');
-        const fileArea = document.getElementById('varFileGroup');
-        const scriptIn = document.getElementById('varScript');
-
-        valIn.classList.add('hidden');
-        scriptArea.classList.add('hidden');
-        fileArea.classList.add('hidden');
-
-        if(type === 'text' || type === 'url') {
-            valIn.classList.remove('hidden');
-            valIn.placeholder = type === 'url' ? 'https://...' : 'Valor...';
-        } else if(type === 'js') {
-            valIn.classList.remove('hidden'); valIn.disabled = true;
-            scriptArea.classList.remove('hidden');
+        const type = document.getElementById('varType').value; const valIn = document.getElementById('varValue'); const scriptArea = document.getElementById('varScriptGroup'); const fileArea = document.getElementById('varFileGroup'); const scriptIn = document.getElementById('varScript');
+        valIn.classList.add('hidden'); scriptArea.classList.add('hidden'); fileArea.classList.add('hidden');
+        if(type === 'text' || type === 'url') { valIn.classList.remove('hidden'); valIn.placeholder = type === 'url' ? 'https://...' : 'Valor...'; }
+        else if(type === 'js') {
+            valIn.classList.remove('hidden'); valIn.disabled = true; scriptArea.classList.remove('hidden');
             if(!scriptIn.value.trim()) {
-                const d = getPhaseData(getCurrentProject(), data.lastPhase);
-                const currentIdx = parseInt(document.getElementById('varEditIndex').value);
+                const d = getPhaseData(getCurrentProject(), data.lastPhase); const currentIdx = parseInt(document.getElementById('varEditIndex').value);
                 const vars = d.vars.filter((v,i)=>i!==currentIdx && (v.type==='text'||v.type==='url')).map(v=>v.name);
                 scriptIn.value = vars.length ? `// vars.${vars[0]}` : '// return "Hola"';
             }
-        } else if(type === 'file') {
-            fileArea.classList.remove('hidden');
-        }
+        } else if(type === 'file') fileArea.classList.remove('hidden');
     }
 
     function saveVar() {
-        const idx = parseInt(document.getElementById('varEditIndex').value);
-        const d = getPhaseData(getCurrentProject(), data.lastPhase);
+        const idx = parseInt(document.getElementById('varEditIndex').value); const d = getPhaseData(getCurrentProject(), data.lastPhase);
         const type = document.getElementById('varType').value;
-        const newV = { name: document.getElementById('varName').value, type, id: crypto.randomUUID() }; // Ensure ID
-        
+        const newV = { name: document.getElementById('varName').value, type, id: crypto.randomUUID() };
         if(!newV.name) return;
         if(type==='text'||type==='url') newV.value = document.getElementById('varValue').value;
-        else if(type==='js') { newV.script = document.getElementById('varScript').value; newV.value = ''; }
+        else if(type==='js') newV.script = document.getElementById('varScript').value;
         else if(type==='file') newV.fileContent = document.getElementById('varFileContent').value;
 
-        if(idx >= 0) {
-            newV.id = d.vars[idx].id; // Keep existing ID
-            d.vars[idx] = newV;
-        } else d.vars.push(newV);
+        if(idx >= 0) { newV.id = d.vars[idx].id; d.vars[idx] = newV; } else d.vars.push(newV);
+        
+        // AUTO UPDATE ALL VARS ON SAVE
+        evaluateAllVars(d.vars);
         save(); closeModal('modalVar'); renderPhaseContent();
     }
 
-    function deleteVarFromModal() {
-        const idx = parseInt(document.getElementById('varEditIndex').value);
-        if(idx>=0) { getPhaseData(getCurrentProject(), data.lastPhase).vars.splice(idx,1); save(); }
-        closeModal('modalVar'); renderPhaseContent();
-    }
-
+    function deleteVarFromModal() { const idx = parseInt(document.getElementById('varEditIndex').value); if(idx>=0) { getPhaseData(getCurrentProject(), data.lastPhase).vars.splice(idx,1); save(); } closeModal('modalVar'); renderPhaseContent(); }
+    
     function handleVarClick(idx, e) {
-        if(e.shiftKey) { openVarModal(idx); return; }
-        const d = getPhaseData(getCurrentProject(), data.lastPhase);
-        const v = d.vars[idx];
-
+        if(e.shiftKey) { openVarModal(idx); return; } e.stopPropagation();
+        const d = getPhaseData(getCurrentProject(), data.lastPhase); const v = d.vars[idx];
         if(v.type === 'text') { navigator.clipboard.writeText(v.value); showToast("Copiado"); }
         else if(v.type === 'url') window.open(fixUrl(v.value), '_blank');
         else if(v.type === 'js') {
-            const ctx = {}; d.vars.forEach(vr => {if(vr.name!==v.name) ctx[vr.name]=vr.value;});
-            try { const fn = new Function('vars', v.script); v.value = String(fn(ctx)); navigator.clipboard.writeText(v.value); showToast("Ejecutado y copiado"); save(); renderPhaseContent(); } catch(e){alert(e.message);}
+            // Re-evaluate specifically this one to be sure
+            evaluateAllVars(d.vars);
+            navigator.clipboard.writeText(v.value); showToast("Copiado"); save(); renderPhaseContent();
         }
         else if(v.type === 'file') {
-            let c = v.fileContent||'';
-            const ctx={}; d.vars.forEach(vr=>ctx[vr.name]=vr.value||'');
+            let c = v.fileContent||''; const ctx={}; d.vars.forEach(vr=>ctx[vr.name]=vr.value||'');
             c = c.replace(/\{\{(.+?)\}\}/g, (m,p1) => ctx[p1.trim()] || m);
             navigator.clipboard.writeText(c); showToast("Fichero copiado");
         }
     }
 
     function openTaskModal(idx = -1) {
-        document.getElementById('taskEditIndex').value = idx;
-        const d = getPhaseData(getCurrentProject(), data.lastPhase);
+        document.getElementById('taskEditIndex').value = idx; const d = getPhaseData(getCurrentProject(), data.lastPhase);
         document.getElementById('newTaskInput').value = idx >= 0 ? d.tasks[idx].desc : '';
+        const sel = document.getElementById('taskVarSelect'); sel.innerHTML = '<option value="">-- Sin variable asociada --</option>';
+        d.vars.forEach(v => { const opt = document.createElement('option'); opt.value = v.id; opt.textContent = `${v.name} (${v.type})`; sel.appendChild(opt); });
+        sel.value = (idx >= 0 && d.tasks[idx].linkedVarId) ? d.tasks[idx].linkedVarId : "";
         openModal('modalTask', 'newTaskInput');
     }
 
     function saveTask() {
-        const val = document.getElementById('newTaskInput').value.trim();
-        const idx = parseInt(document.getElementById('taskEditIndex').value);
-        const d = getPhaseData(getCurrentProject(), data.lastPhase);
+        const val = document.getElementById('newTaskInput').value.trim(); const idx = parseInt(document.getElementById('taskEditIndex').value); const linkedVarId = document.getElementById('taskVarSelect').value; const d = getPhaseData(getCurrentProject(), data.lastPhase);
         if(val) {
-            if(idx>=0) d.tasks[idx].desc = val; else d.tasks.push({desc:val, done:false, id: crypto.randomUUID()});
+            if(idx>=0) { d.tasks[idx].desc = val; d.tasks[idx].linkedVarId = linkedVarId || null; } 
+            else d.tasks.push({ desc: val, done: false, id: crypto.randomUUID(), linkedVarId: linkedVarId || null });
             save(); renderPhaseTabs();
         }
         closeModal('modalTask');
     }
 
-    function handleTaskClick(idx, e) {
-        if(e.shiftKey) openTaskModal(idx); else toggleTask(idx);
-    }
+    function handleTaskClick(idx, e) { if(e.shiftKey) openTaskModal(idx); else toggleTask(idx); }
+    function toggleTask(idx) { const d = getPhaseData(getCurrentProject(), data.lastPhase); d.tasks[idx].done = !d.tasks[idx].done; save(); renderPhaseTabs(); }
+    function deleteTask(idx) { getPhaseData(getCurrentProject(), data.lastPhase).tasks.splice(idx, 1); save(); renderPhaseTabs(); }
+    function deleteTaskFromModal() { const idx = parseInt(document.getElementById('taskEditIndex').value); if(idx >= 0) deleteTask(idx); closeModal('modalTask'); }
 
-    function toggleTask(idx) {
-        const d = getPhaseData(getCurrentProject(), data.lastPhase);
-        d.tasks[idx].done = !d.tasks[idx].done;
-        save(); renderPhaseTabs();
-    }
-
-    function deleteTask(idx) {
-        getPhaseData(getCurrentProject(), data.lastPhase).tasks.splice(idx, 1);
-        save(); renderPhaseTabs();
-    }
-
-    function deleteTaskFromModal() {
-        const idx = parseInt(document.getElementById('taskEditIndex').value);
-        if(idx >= 0) deleteTask(idx);
-        closeModal('modalTask');
-    }
-
-    // --- GLOBAL PHASES (DnD) ---
-    function addGlobalPhase() {
-        const name = document.getElementById('newPhaseName').value;
-        if(name) {
-            data.globalPhases.push({ id: crypto.randomUUID(), name });
-            document.getElementById('newPhaseName').value = '';
-            save(); renderGlobalPhasesList(); renderPhaseTabs();
-        }
-    }
-
+    // --- PHASES DND ---
+    function addGlobalPhase() { const name = document.getElementById('newPhaseName').value; if(name) { data.globalPhases.push({ id: crypto.randomUUID(), name }); document.getElementById('newPhaseName').value = ''; save(); renderGlobalPhasesList(); renderPhaseTabs(); } }
     function renderGlobalPhasesList() {
-        const list = document.getElementById('globalPhasesList');
-        list.innerHTML = '';
+        const list = document.getElementById('globalPhasesList'); list.innerHTML = '';
         data.globalPhases.forEach((gp, idx) => {
-            const div = document.createElement('div');
-            div.className = 'draggable-item';
-            div.draggable = true;
-            div.setAttribute('data-id', gp.id);
-            div.innerHTML = `
-                <span class="drag-handle">⋮⋮</span>
-                <span style="flex:1">${gp.name}</span>
-                <button style="color:#ef4444; background:none; border:none; cursor:pointer;" onclick="deleteGlobalPhase(${idx})">×</button>
-            `;
+            const div = document.createElement('div'); div.className = 'draggable-item'; div.draggable = true; div.setAttribute('data-id', gp.id);
+            div.innerHTML = `<span class="drag-handle">⋮⋮</span><span style="flex:1">${gp.name}</span><button style="color:#ef4444; background:none; border:none; cursor:pointer;" onclick="deleteGlobalPhase(${idx})">×</button>`;
             list.appendChild(div);
         });
     }
-
-    function deleteGlobalPhase(idx) {
-        if(confirm('¿Borrar fase global?')) {
-            data.globalPhases.splice(idx, 1);
-            save(); renderGlobalPhasesList(); renderPhaseTabs();
-        }
+    function deleteGlobalPhase(idx) { if(confirm('¿Borrar?')) { data.globalPhases.splice(idx, 1); save(); renderGlobalPhasesList(); renderPhaseTabs(); } }
+    function setupDragAndDrop() {
+        const container = document.getElementById('globalPhasesList');
+        container.addEventListener('dragstart', (e) => { e.target.classList.add('dragging'); });
+        container.addEventListener('dragend', (e) => { e.target.classList.remove('dragging'); updateGlobalPhasesOrder(); });
+        container.addEventListener('dragover', (e) => { e.preventDefault(); const afterElement = getDragAfterElement(container, e.clientY); const draggable = document.querySelector('#globalPhasesList .dragging'); if (afterElement == null) container.appendChild(draggable); else container.insertBefore(draggable, afterElement); });
     }
+    function getDragAfterElement(container, y) { const draggableElements = [...container.querySelectorAll('.draggable-item:not(.dragging)')]; return draggableElements.reduce((closest, child) => { const box = child.getBoundingClientRect(); const offset = y - box.top - box.height / 2; if (offset < 0 && offset > closest.offset) return { offset: offset, element: child }; else return closest; }, { offset: Number.NEGATIVE_INFINITY }).element; }
+    function updateGlobalPhasesOrder() { const container = document.getElementById('globalPhasesList'); const newOrderIds = [...container.querySelectorAll('.draggable-item')].map(el => el.getAttribute('data-id')); const newPhases = []; newOrderIds.forEach(id => { const phase = data.globalPhases.find(p => p.id === id); if(phase) newPhases.push(phase); }); data.globalPhases = newPhases; save(); renderPhaseTabs(); }
+
+    // --- TABLE DND ---
+    function setupTableDragAndDrop(tableId, updateCallback) {
+        const container = document.getElementById(tableId); let draggedItem = null;
+        container.addEventListener('dragstart', (e) => { draggedItem = e.target.closest('tr'); if(draggedItem) draggedItem.classList.add('dragging'); });
+        container.addEventListener('dragend', (e) => { if(draggedItem) draggedItem.classList.remove('dragging'); updateCallback(); });
+        container.addEventListener('dragover', (e) => { e.preventDefault(); const afterElement = getTableDragAfterElement(container, e.clientY); const draggable = document.querySelector(`#${tableId} .dragging`); if (afterElement == null) container.appendChild(draggable); else container.insertBefore(draggable, afterElement); });
+    }
+    function getTableDragAfterElement(container, y) { const draggableElements = [...container.querySelectorAll('tr:not(.dragging)')]; return draggableElements.reduce((closest, child) => { const box = child.getBoundingClientRect(); const offset = y - box.top - box.height / 2; if (offset < 0 && offset > closest.offset) return { offset: offset, element: child }; else return closest; }, { offset: Number.NEGATIVE_INFINITY }).element; }
+    function updateTaskOrderFinal() { const container = document.getElementById('tasksTable'); const ids = [...container.querySelectorAll('tr')].map(row => row.getAttribute('data-id')); const d = getPhaseData(getCurrentProject(), data.lastPhase); const newArr = []; ids.forEach(id => { const item = d.tasks.find(t => t.id === id); if(item) newArr.push(item); }); d.tasks = newArr; save(); renderPhaseContent(); }
+    function updateVarOrderFinal() { const container = document.getElementById('varsTable'); const ids = [...container.querySelectorAll('tr')].map(row => row.getAttribute('data-id')); const d = getPhaseData(getCurrentProject(), data.lastPhase); const newArr = []; ids.forEach(id => { const item = d.vars.find(v => v.id === id); if(item) newArr.push(item); }); d.vars = newArr; save(); renderPhaseContent(); }
 
     // --- MODAL UTILS ---
-    function openModal(id, focusId) {
-        document.getElementById(id).classList.remove('hidden');
-        if(focusId) setTimeout(() => document.getElementById(focusId).focus(), 50);
-    }
+    function openModal(id, focusId) { document.getElementById(id).classList.remove('hidden'); if(focusId) setTimeout(() => document.getElementById(focusId).focus(), 50); }
     function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
 </script>
