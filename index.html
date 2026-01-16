@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FLOWBOARD v26</title>
+    <title>FLOWBOARD v27</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -317,8 +317,15 @@
     let data = { globalPhases: [], projects: [], lastProject: null, lastPhase: null };
 
     document.addEventListener('DOMContentLoaded', () => {
-        const lastEntity = localStorage.getItem('flowboard_last_entity');
-        if (lastEntity) loadEntity(lastEntity); else openEntityModal();
+        const urlParams = new URLSearchParams(window.location.search);
+        const entityFromUrl = urlParams.get('entity');
+
+        if (entityFromUrl) {
+            loadEntity(entityFromUrl);
+        } else {
+            const lastEntity = localStorage.getItem('flowboard_last_entity');
+            if (lastEntity) loadEntity(lastEntity); else openEntityModal();
+        }
         setupDragAndDrop();
     });
 
