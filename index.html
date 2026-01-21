@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FLOWBOARD v27</title>
+    <title>FLOWBOARD v28</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -170,7 +170,7 @@
     </div>
     <div id="projectArea" class="hidden" style="display: flex; flex-direction: column; height: 100%;">
         <header class="top-bar">
-            <span id="projectTitle" class="project-title" onclick="handleProjectTitleClick(event)" title="Shift+Click para renombrar"></span>
+            <span id="projectTitle" class="project-title" onclick="handleProjectTitleClick(event)" ondblclick="openRenameProjectModal()" title="Shift+Click o Doble Click para renombrar"></span>
             <div class="header-actions">
                 <button id="btnTemplateToggle" class="btn-header template" onclick="toggleTemplateStatus()">Hacer Plantilla</button>
                 <button class="btn-header clone" onclick="cloneProject()">Clonar</button>
@@ -179,12 +179,12 @@
         </header>
         <div id="processBar" class="process-bar"></div>
         <div id="contentArea" class="phase-content">
-            <div class="main-link-card" onclick="handleMainLinkClick(event)">
+            <div class="main-link-card" onclick="handleMainLinkClick(event)" ondblclick="openMainLinkModal()">
                 <div class="main-link-icon">🔗</div>
                 <div class="main-link-info">
                     <div id="mainLinkText" class="main-link-text">Configurar URL</div>
                 </div>
-                <div class="main-link-hint">Shift+Click para editar</div>
+                <div class="main-link-hint">Shift+Click o Doble Click para editar</div>
             </div>
             <div class="split-view">
                 <div class="panel">
@@ -408,7 +408,11 @@
     function getPhaseData(proj, phaseId) { if(!proj) return null; if(!proj.phaseData) proj.phaseData = {}; if(!proj.phaseData[phaseId]) proj.phaseData[phaseId] = { tasks: [], vars: [], mainLink: null }; return proj.phaseData[phaseId]; }
     function toggleTemplateStatus() { const p = getCurrentProject(); if(!p) return; if(!p.isTemplate) data.projects.forEach(proj => proj.isTemplate = false); p.isTemplate = !p.isTemplate; save(); renderMainView(); }
     function deleteProject() { if(!confirm('¿Eliminar?')) return; data.projects = data.projects.filter(p => p.id !== data.lastProject); data.lastProject = null; save(); renderProjectList(); renderMainView(); }
-    function handleProjectTitleClick(e) { if(e.shiftKey) { const p = getCurrentProject(); if(p) { document.getElementById('renameProjectInput').value = p.name; openModal('modalRenameProject', 'renameProjectInput'); } } }
+    
+    // Editado: Extraída lógica de renombrado
+    function handleProjectTitleClick(e) { if(e.shiftKey) openRenameProjectModal(); }
+    function openRenameProjectModal() { const p = getCurrentProject(); if(p) { document.getElementById('renameProjectInput').value = p.name; openModal('modalRenameProject', 'renameProjectInput'); } }
+    
     function saveProjectRename() { const newName = document.getElementById('renameProjectInput').value.trim(); if(newName) { getCurrentProject().name = newName; save(); renderMainView(); closeModal('modalRenameProject'); } }
 
     // --- RENDER ---
@@ -470,10 +474,12 @@
                 if(vIndex >= 0) {
                     const v = d.vars[vIndex];
                     let icon = '⚡'; if(v.type === 'text') icon = 'T'; if(v.type === 'url') icon = '🔗'; if(v.type === 'file') icon = '📄';
-                    varIconHtml = `<button class="btn-link-action" title="Ejecutar/Copiar variable: ${v.name}" onclick="handleVarClick(${vIndex}, event)">${icon}</button>`;
+                    // Editado: ondblclick añadido
+                    varIconHtml = `<button class="btn-link-action" title="Ejecutar/Copiar variable: ${v.name}" onclick="handleVarClick(${vIndex}, event)" ondblclick="openVarModal(${vIndex})">${icon}</button>`;
                 }
             }
-            tr.innerHTML = `<td class="drag-handle-cell">⋮⋮</td><td class="task-link-cell">${varIconHtml}</td><td class="task-check-cell" onclick="toggleTask(${idx})"><div class="task-checkbox">${t.done ? '✓' : ''}</div></td><td class="task-desc" onclick="handleTaskClick(${idx}, event)">${t.desc}</td><td class="action-cell"><button class="btn-mini" onclick="deleteTask(${idx})">×</button></td>`;
+            // Editado: ondblclick añadido a la descripción
+            tr.innerHTML = `<td class="drag-handle-cell">⋮⋮</td><td class="task-link-cell">${varIconHtml}</td><td class="task-check-cell" onclick="toggleTask(${idx})"><div class="task-checkbox">${t.done ? '✓' : ''}</div></td><td class="task-desc" onclick="handleTaskClick(${idx}, event)" ondblclick="openTaskModal(${idx})">${t.desc}</td><td class="action-cell"><button class="btn-mini" onclick="deleteTask(${idx})">×</button></td>`;
             tasksTable.appendChild(tr);
         });
 
@@ -482,7 +488,8 @@
             const tr = document.createElement('tr'); tr.setAttribute('draggable', 'true'); tr.setAttribute('data-id', v.id);
             let typeIcon = 'T'; let displayVal = v.value || '...';
             if(v.type === 'url') typeIcon = '🔗'; if(v.type === 'js') typeIcon = '⚡'; if(v.type === 'file') { typeIcon = '📄'; displayVal = 'Copiar fichero'; }
-            tr.innerHTML = `<td class="drag-handle-cell">⋮⋮</td><td class="var-name"><span style="opacity:0.5; margin-right:4px;">${typeIcon}</span> ${v.name}</td><td><div class="var-value" onclick="handleVarClick(${idx}, event)">${displayVal}</div></td>`;
+            // Editado: ondblclick añadido al valor
+            tr.innerHTML = `<td class="drag-handle-cell">⋮⋮</td><td class="var-name"><span style="opacity:0.5; margin-right:4px;">${typeIcon}</span> ${v.name}</td><td><div class="var-value" onclick="handleVarClick(${idx}, event)" ondblclick="openVarModal(${idx})">${displayVal}</div></td>`;
             varsTable.appendChild(tr);
         });
         setupTableDragAndDrop('tasksTable', updateTaskOrderFinal); setupTableDragAndDrop('varsTable', updateVarOrderFinal);
