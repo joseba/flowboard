@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FLOWBOARD v29</title>
+    <title>FLOWBOARD v30</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -258,8 +258,15 @@
     <div class="modal">
         <div class="modal-title">Variable</div>
         <input type="hidden" id="varEditIndex">
+        
         <div style="display:flex; flex-direction:column; gap:12px;">
             <input type="text" id="varName" placeholder="Nombre (ej: API_KEY)">
+            
+            <div style="display:flex; align-items:center; gap:8px;">
+                <input type="checkbox" id="varIsGlobal" style="width: auto;">
+                <label for="varIsGlobal" style="font-size:12px; cursor:pointer; user-select:none;">Variable Global (Visible en todas las fases)</label>
+            </div>
+
             <select id="varType" onchange="updateVarModalUI()">
                 <option value="text">Texto (Copiar)</option>
                 <option value="url">URL (Abrir)</option>
@@ -378,17 +385,15 @@
 
     // --- JS EXECUTION ENGINE ---
     function evaluateAllVars(vars) {
-        // First pass: context from text/url
         const ctx = {};
         vars.forEach(v => { if (v.type !== 'js') ctx[v.name] = v.value || ''; });
         
-        // Second pass: run JS. We iterate twice to allow some dependency chaining
         for(let i=0; i<2; i++) {
             vars.forEach(v => {
                 if (v.type === 'js') {
                     try { const fn = new Function('vars', v.script); v.value = String(fn(ctx)); } 
                     catch(e) { v.value = "Error: " + e.message; }
-                    ctx[v.name] = v.value; // Update context for subsequent vars
+                    ctx[v.name] = v.value; 
                 }
             });
         }
@@ -409,10 +414,8 @@
     function toggleTemplateStatus() { const p = getCurrentProject(); if(!p) return; if(!p.isTemplate) data.projects.forEach(proj => proj.isTemplate = false); p.isTemplate = !p.isTemplate; save(); renderMainView(); }
     function deleteProject() { if(!confirm('¿Eliminar?')) return; data.projects = data.projects.filter(p => p.id !== data.lastProject); data.lastProject = null; save(); renderProjectList(); renderMainView(); }
     
-    // Editado: Extraída lógica de renombrado
     function handleProjectTitleClick(e) { if(e.shiftKey) openRenameProjectModal(); }
     function openRenameProjectModal() { const p = getCurrentProject(); if(p) { document.getElementById('renameProjectInput').value = p.name; openModal('modalRenameProject', 'renameProjectInput'); } }
-    
     function saveProjectRename() { const newName = document.getElementById('renameProjectInput').value.trim(); if(newName) { getCurrentProject().name = newName; save(); renderMainView(); closeModal('modalRenameProject'); } }
 
     // --- RENDER ---
@@ -458,7 +461,6 @@
     function renderPhaseContent() {
         const p = getCurrentProject(); const d = getPhaseData(p, data.lastPhase); if(!d) return;
         
-        // --- REACTIVITY: EXECUTE JS ---
         evaluateAllVars(d.vars);
 
         const linkText = document.getElementById('mainLinkText');
@@ -474,11 +476,9 @@
                 if(vIndex >= 0) {
                     const v = d.vars[vIndex];
                     let icon = '⚡'; if(v.type === 'text') icon = 'T'; if(v.type === 'url') icon = '🔗'; if(v.type === 'file') icon = '📄';
-                    // Editado: ondblclick añadido
                     varIconHtml = `<button class="btn-link-action" title="Ejecutar/Copiar variable: ${v.name}" onclick="handleVarClick(${vIndex}, event)" ondblclick="openVarModal(${vIndex})">${icon}</button>`;
                 }
             }
-            // Editado: ondblclick añadido a la descripción
             tr.innerHTML = `<td class="drag-handle-cell">⋮⋮</td><td class="task-link-cell">${varIconHtml}</td><td class="task-check-cell" onclick="toggleTask(${idx})"><div class="task-checkbox">${t.done ? '✓' : ''}</div></td><td class="task-desc" onclick="handleTaskClick(${idx}, event)" ondblclick="openTaskModal(${idx})">${t.desc}</td><td class="action-cell"><button class="btn-mini" onclick="deleteTask(${idx})">×</button></td>`;
             tasksTable.appendChild(tr);
         });
@@ -488,8 +488,11 @@
             const tr = document.createElement('tr'); tr.setAttribute('draggable', 'true'); tr.setAttribute('data-id', v.id);
             let typeIcon = 'T'; let displayVal = v.value || '...';
             if(v.type === 'url') typeIcon = '🔗'; if(v.type === 'js') typeIcon = '⚡'; if(v.type === 'file') { typeIcon = '📄'; displayVal = 'Copiar fichero'; }
-            // Editado: ondblclick añadido al valor
-            tr.innerHTML = `<td class="drag-handle-cell">⋮⋮</td><td class="var-name"><span style="opacity:0.5; margin-right:4px;">${typeIcon}</span> ${v.name}</td><td><div class="var-value" onclick="handleVarClick(${idx}, event)" ondblclick="openVarModal(${idx})">${displayVal}</div></td>`;
+            
+            // Visual indicator for globals
+            const globalIndicator = v.isGlobal ? '<span style="color:#fbbf24; font-weight:bold; font-size:10px; margin-left:4px;" title="Global">(G)</span>' : '';
+
+            tr.innerHTML = `<td class="drag-handle-cell">⋮⋮</td><td class="var-name"><span style="opacity:0.5; margin-right:4px;">${typeIcon}</span> ${v.name} ${globalIndicator}</td><td><div class="var-value" onclick="handleVarClick(${idx}, event)" ondblclick="openVarModal(${idx})">${displayVal}</div></td>`;
             varsTable.appendChild(tr);
         });
         setupTableDragAndDrop('tasksTable', updateTaskOrderFinal); setupTableDragAndDrop('varsTable', updateVarOrderFinal);
@@ -502,8 +505,16 @@
 
     function openVarModal(idx = -1) {
         document.getElementById('varEditIndex').value = idx; const d = getPhaseData(getCurrentProject(), data.lastPhase);
-        const v = idx >= 0 ? d.vars[idx] : {name:'', type:'text', value:'', script:'', fileContent:''};
-        document.getElementById('varName').value = v.name; document.getElementById('varType').value = v.type; document.getElementById('varValue').value = v.value || ''; document.getElementById('varScript').value = v.script || ''; document.getElementById('varFileContent').value = v.fileContent || '';
+        const v = idx >= 0 ? d.vars[idx] : {name:'', type:'text', value:'', script:'', fileContent:'', isGlobal: false};
+        
+        document.getElementById('varName').value = v.name; 
+        document.getElementById('varType').value = v.type; 
+        document.getElementById('varValue').value = v.value || ''; 
+        document.getElementById('varScript').value = v.script || ''; 
+        document.getElementById('varFileContent').value = v.fileContent || '';
+        // SET CHECKBOX STATE
+        document.getElementById('varIsGlobal').checked = v.isGlobal || false;
+
         updateVarModalUI(); openModal('modalVar', 'varName');
     }
 
@@ -522,22 +533,89 @@
     }
 
     function saveVar() {
-        const idx = parseInt(document.getElementById('varEditIndex').value); const d = getPhaseData(getCurrentProject(), data.lastPhase);
+        const idx = parseInt(document.getElementById('varEditIndex').value); 
+        const d = getPhaseData(getCurrentProject(), data.lastPhase);
+        const project = getCurrentProject();
+        
         const type = document.getElementById('varType').value;
-        const newV = { name: document.getElementById('varName').value, type, id: crypto.randomUUID() };
+        const isGlobal = document.getElementById('varIsGlobal').checked;
+        
+        // Construct basic object
+        const newV = { 
+            name: document.getElementById('varName').value, 
+            type, 
+            isGlobal,
+            id: (idx >= 0) ? d.vars[idx].id : crypto.randomUUID() 
+        };
+
         if(!newV.name) return;
+        
         if(type==='text'||type==='url') newV.value = document.getElementById('varValue').value;
         else if(type==='js') newV.script = document.getElementById('varScript').value;
         else if(type==='file') newV.fileContent = document.getElementById('varFileContent').value;
 
-        if(idx >= 0) { newV.id = d.vars[idx].id; d.vars[idx] = newV; } else d.vars.push(newV);
+        // LOGIC: GLOBAL PROPAGATION
+        if (isGlobal) {
+            // Apply to ALL phases
+            data.globalPhases.forEach(gp => {
+                const pData = getPhaseData(project, gp.id);
+                const existingIdx = pData.vars.findIndex(v => v.id === newV.id);
+                
+                // If exists, replace (keep order). If not, add to end.
+                if (existingIdx >= 0) {
+                    pData.vars[existingIdx] = newV;
+                } else {
+                    pData.vars.push(newV);
+                }
+            });
+        } else {
+            // Local logic: Apply ONLY to current phase
+            if(idx >= 0) { 
+                d.vars[idx] = newV; 
+            } else { 
+                d.vars.push(newV); 
+            }
+
+            // CLEANUP: If it was previously global (or purely safety), remove it from other phases
+            data.globalPhases.forEach(gp => {
+                if (gp.id !== data.lastPhase) {
+                    const pData = getPhaseData(project, gp.id);
+                    // Filter out this specific variable ID from other phases
+                    pData.vars = pData.vars.filter(v => v.id !== newV.id);
+                }
+            });
+        }
         
-        // AUTO UPDATE ALL VARS ON SAVE
+        // AUTO UPDATE ALL VARS ON SAVE (Recalculate JS values)
+        // We need to re-calc for the current phase at least for immediate feedback
         evaluateAllVars(d.vars);
-        save(); closeModal('modalVar'); renderPhaseContent();
+        
+        save(); 
+        closeModal('modalVar'); 
+        renderPhaseContent();
     }
 
-    function deleteVarFromModal() { const idx = parseInt(document.getElementById('varEditIndex').value); if(idx>=0) { getPhaseData(getCurrentProject(), data.lastPhase).vars.splice(idx,1); save(); } closeModal('modalVar'); renderPhaseContent(); }
+    function deleteVarFromModal() { 
+        const idx = parseInt(document.getElementById('varEditIndex').value); 
+        if(idx >= 0) { 
+            const d = getPhaseData(getCurrentProject(), data.lastPhase);
+            const vToDelete = d.vars[idx];
+
+            if (vToDelete.isGlobal) {
+                // Remove from ALL phases
+                data.globalPhases.forEach(gp => {
+                    const pData = getPhaseData(getCurrentProject(), gp.id);
+                    pData.vars = pData.vars.filter(v => v.id !== vToDelete.id);
+                });
+            } else {
+                // Remove from CURRENT phase only
+                d.vars.splice(idx, 1); 
+            }
+            save(); 
+        } 
+        closeModal('modalVar'); 
+        renderPhaseContent(); 
+    }
     
     function handleVarClick(idx, e) {
         if(e.shiftKey) { openVarModal(idx); return; } e.stopPropagation();
@@ -545,15 +623,12 @@
         if(v.type === 'text') { navigator.clipboard.writeText(v.value); showToast("Copiado"); }
         else if(v.type === 'url') window.open(fixUrl(v.value), '_blank');
         else if(v.type === 'js') {
-            // Re-evaluate specifically this one to be sure
             evaluateAllVars(d.vars);
             navigator.clipboard.writeText(v.value); showToast("Copiado"); save(); renderPhaseContent();
         }
         else if(v.type === 'file') {
             let c = v.fileContent||''; const ctx={}; 
-            // CORRECCION AQUI: Si es fichero usa fileContent, si no usa value
             d.vars.forEach(vr => ctx[vr.name] = (vr.type === 'file' ? vr.fileContent : vr.value) || '');
-            
             c = c.replace(/\{\{(.+?)\}\}/g, (m,p1) => ctx[p1.trim()] || m);
             navigator.clipboard.writeText(c); showToast("Fichero copiado");
         }
