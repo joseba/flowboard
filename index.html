@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FLOWBOARD v30</title>
+    <title>FLOWBOARD v31</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -334,6 +334,11 @@
             if (lastEntity) loadEntity(lastEntity); else openEntityModal();
         }
         setupDragAndDrop();
+        
+        // --- CORRECCIÓN: Se inicializa el drag and drop de tablas SOLO UNA VEZ ---
+        setupTableDragAndDrop('tasksTable', updateTaskOrderFinal);
+        setupTableDragAndDrop('varsTable', updateVarOrderFinal);
+        // ------------------------------------------------------------------------
     });
 
     function openEntityModal() { document.getElementById('entityInput').value = ''; document.getElementById('modalEntity').classList.remove('hidden'); setTimeout(() => document.getElementById('entityInput').focus(), 100); }
@@ -495,7 +500,8 @@
             tr.innerHTML = `<td class="drag-handle-cell">⋮⋮</td><td class="var-name"><span style="opacity:0.5; margin-right:4px;">${typeIcon}</span> ${v.name} ${globalIndicator}</td><td><div class="var-value" onclick="handleVarClick(${idx}, event)" ondblclick="openVarModal(${idx})">${displayVal}</div></td>`;
             varsTable.appendChild(tr);
         });
-        setupTableDragAndDrop('tasksTable', updateTaskOrderFinal); setupTableDragAndDrop('varsTable', updateVarOrderFinal);
+        
+        // --- CORRECCIÓN: Se han borrado las llamadas a setupTableDragAndDrop de aquí ---
     }
 
     // --- ACTIONS ---
