@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FLOWBOARD v28</title>
+    <title>FLOWBOARD v29</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -550,7 +550,10 @@
             navigator.clipboard.writeText(v.value); showToast("Copiado"); save(); renderPhaseContent();
         }
         else if(v.type === 'file') {
-            let c = v.fileContent||''; const ctx={}; d.vars.forEach(vr=>ctx[vr.name]=vr.value||'');
+            let c = v.fileContent||''; const ctx={}; 
+            // CORRECCION AQUI: Si es fichero usa fileContent, si no usa value
+            d.vars.forEach(vr => ctx[vr.name] = (vr.type === 'file' ? vr.fileContent : vr.value) || '');
+            
             c = c.replace(/\{\{(.+?)\}\}/g, (m,p1) => ctx[p1.trim()] || m);
             navigator.clipboard.writeText(c); showToast("Fichero copiado");
         }
